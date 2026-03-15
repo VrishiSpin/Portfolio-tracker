@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vrishank Ram - Activity Portfolio Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background: #0a0a0a;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .stat-card:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card.clickable::after {
+            content: '✏️';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #1f2937;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+        
+        .btn-secondary:hover {
+            background: #374151;
+        }
+        
+        .section {
+            background: #1a1a1a;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid #2a2a2a;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2a2a2a;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+        
+        .add-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .add-btn:hover {
+            background: #2563eb;
+        }
+        
+        .item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+            background: #0f0f0f;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .item:hover {
+            background: #1f1f1f;
+            transform: translateX(5px);
+        }
+        
+        .item-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #f0f0f0;
+        }
+        
+        .item-meta {
+            color: #9ca3af;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .item-description {
+            color: #d1d5db;
+            margin-top: 8px;
+        }
+        
+        .item-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .item-actions button {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        
+        .edit-btn {
+            background: #f59e0b;
+            color: #000;
+        }
+        
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #374151;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+            background: #0f0f0f;
+            color: #e0e0e0;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            background: #0f0f0f;
+            color: #e0e0e0;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            border-bottom: 2px solid #2a2a2a;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: #1a1a1a;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #9ca3af;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            color: #60a5fa;
+            background: #0f0f0f;
+        }
+        
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        h2 {
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Vrishank Ram</h1>
+            <p>Activity Portfolio Tracker | Archbishop Mitty High School '27</p>
+            <div class="stats">
+                <div class="stat-card clickable" data-stat="gpa">
+                    <div class="stat-number" id="statGPA">4.0</div>
+                    <div class="stat-label">UW GPA</div>
+                </div>
+                <div class="stat-card clickable" data-stat="wgpa">
+                    <div class="stat-number" id="statWGPA">4.571</div>
+                    <div class="stat-label">W GPA</div>
+                </div>
+                <div class="stat-card clickable" data-stat="sat">
+                    <div class="stat-number" id="statSAT">1550</div>
+                    <div class="stat-label">SAT Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statCourses">0</div>
+                    <div class="stat-label">Coursework</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statProjects">0</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search activities, projects, courses...">
+            <button class="btn btn-primary" id="exportBtn">📥 Export All Data</button>
+            <button class="btn btn-secondary" id="importBtn">📤 Import Data</button>
+            <button class="btn btn-secondary" id="resumeBtn">📄 Generate Resume</button>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="academics">Academics</button>
+            <button class="tab" data-tab="research">Research</button>
+            <button class="tab" data-tab="projects">Projects</button>
+            <button class="tab" data-tab="extracurriculars">Extracurriculars</button>
+            <button class="tab" data-tab="awards">Awards</button>
+            <button class="tab" data-tab="volunteering">Volunteering</button>
+            <button class="tab" data-tab="skills">Skills</button>
+        </div>
+        
+        <!-- Tab Contents -->
+        <div class="tab-content active" data-content="academics">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Academics</h2>
+                    <button class="add-btn" data-category="academics">+ Add Course</button>
+                </div>
+                <div id="academics-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="research">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Research Experience</h2>
+                    <button class="add-btn" data-category="research">+ Add Research</button>
+                </div>
+                <div id="research-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="projects">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Projects</h2>
+                    <button class="add-btn" data-category="projects">+ Add Project</button>
+                </div>
+                <div id="projects-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="extracurriculars">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Extracurricular Activities</h2>
+                    <button class="add-btn" data-category="extracurriculars">+ Add Activity</button>
+                </div>
+                <div id="extracurriculars-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="awards">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Awards & Honors</h2>
+                    <button class="add-btn" data-category="awards">+ Add Award</button>
+                </div>
+                <div id="awards-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="volunteering">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Volunteering</h2>
+                    <button class="add-btn" data-category="volunteering">+ Add Volunteer Work</button>
+                </div>
+                <div id="volunteering-list"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" data-content="skills">
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Skills & Technologies</h2>
+                    <button class="add-btn" data-category="skills">+ Add Skill</button>
+                </div>
+                <div id="skills-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Item</h2>
+            <form id="itemForm">
+                <div class="form-group">
+                    <label for="itemTitle">Title *</label>
+                    <input type="text" id="itemTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemDate">Date/Timeline</label>
+                    <input type="text" id="itemDate" placeholder="e.g., Summer 2024, 2022-Present">
+                </div>
+                <div class="form-group">
+                    <label for="itemRole">Role/Position</label>
+                    <input type="text" id="itemRole" placeholder="e.g., Team Lead, Member">
+                </div>
+                <div class="form-group">
+                    <label for="itemDescription">Description</label>
+                    <textarea id="itemDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="itemHours">Hours (if applicable)</label>
+                    <input type="number" id="itemHours" placeholder="Total hours">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+    
+    <script>
+        // Stats storage
+        let stats = {
+            gpa: 4.0,
+            wgpa: 4.571,
+            sat: 1550
+        };
+        
+        // Data storage - ALL DATA FROM PDF
+        let portfolioData = {
+            academics: [
+                {title: "AP US History", date: "2024-2025", role: "Score: 5", description: "", hours: null},
+                {title: "AP Physics C: Mechanics", date: "2025-2026", role: "In Progress", description: "", hours: null},
+                {title: "AP Calculus AB", date: "2025-2026", role: "In Progress", description: "", hours: null},
+                {title: "AP English Literature", date: "2025-2026", role: "In Progress", description: "", hours: null},
+                {title: "AP World History", date: "2025-2026", role: "In Progress", description: "", hours: null},
+                {title: "Introduction to Coding in Python", date: "Summer 2025", role: "Completed", description: "Took a college python course at De Anza", hours: null},
+                {title: "Chemistry Honors", date: "2024-2025", role: "Completed", description: "", hours: null},
+                {title: "Biology Honors", date: "2023-2024", role: "Completed", description: "", hours: null},
+                {title: "American Literature Honors", date: "2024-2025", role: "Completed", description: "", hours: null}
+            ],
+            research: [
+                {title: "COSMOS UCSC - Photonics Cluster", date: "Summer 2024", role: "Research Assistant under Prof. Ahmet Ali Yanik", description: "Learned from Professor Ali Yanik about wave optics, ray optics, semiconductor physics, and various other light based technologies. Worked with a group to analyze the use of Fresnel lenses for solar sail usage and presented our work to our professors.", hours: null},
+                {title: "Berkeley BioEngineering HS Competition", date: "Fall 2024 - Present", role: "Physics/EE Lead (Team of 5)", description: "Leading physics and electrical engineering for Raman scattering sensor project using photonics-based techniques. Presenting our findings and project at a convention at UC Berkeley", hours: null},
+                {title: "SRA UCSB - Photon Forge", date: "", role: "", description: "Accepted into the UCSB SRA summer program for photonics and electrical engineering", hours: null},
+                {title: "Analyzing the Use of Fresnel Lenses for Solar Sails Research Paper", date: "2024-2026", role: "Co-Author", description: "Co-authored research paper on Fresnel lens optimization for solar sail propulsion (submitted for publication). Designed circular solar sail with Fresnel lens ring using ANSYS Lumerical FDTD simulations.", hours: null}
+            ],
+            projects: [
+                {title: "Synopsys Science Fair - E-Waste Sorting System", date: "2025-2026", role: "Electrical/Mechanical Systems Builder", description: "Designed an automated low-cost e-waste sorting device using Computer vision (YOLOv11), dual-rail gantry, TMC5160 stepper drivers, salt-based heating solution. Budget <$350, 70+ pages documentation.", hours: null},
+                {title: "Custom Tool-Changing 3D Printer", date: "2026", role: "Designer/Builder", description: "Dual Bowden toolhead system on Ender 5 Plus with magnet coupling, Klipper firmware, TMC5160 drivers.", hours: null},
+                {title: "Hand-Carved Cricket Bat", date: "2025 Summer", role: "Builder", description: "Using hand tools and power tools and some wood from Home Depot, I carved my own cricket bat that performed similarly to real English willow bats, learning various new carpentry tools.", hours: null},
+                {title: "Nixie Tube Clock", date: "Summer 2025", role: "Builder", description: "I constructed an Nixie tube clock based off of the anime Steins Gate using k155 Nixie tube drives, 7 Nixie tubes, an Arduino mega, and a high voltage power supply.", hours: null},
+                {title: "Custom Keyboard Business", date: "2024 - 2025", role: "Builder", description: "Since early 2024, I have worked with a variety of custom keyboards, becoming very familiar with the parts and process of constructing them, and even designing many of my own. This passion also allowed me to sell many of these keyboards to close friends and family, and introducing them to custom keyboards as well.", hours: null},
+                {title: "Custom PC Building", date: "2024 - 2025", role: "Builder", description: "As a smaller side hobby, I've always been interested in PC Building. I've built a few of them for a couple of friends and one for myself, and it is an enjoyable way for me to work on EE in a new way.", hours: null},
+                {title: "Electrical Engineering YouTube Channel", date: "2023-Present", role: "Builder", description: "I upload videos about my electrical projects with various transformers and high voltage devices and many other projects.", hours: null},
+                {title: "High-Voltage Inverted Spear of Heaven", date: "2025", role: "Builder", description: "I used high voltage modules within a 3D printed frame to construct the inverted spear of heaven from the anime Jujutsu Kaisen", hours: null},
+                {title: "Electromagnetic Coil Accelerator", date: "2024 Summer", role: "Builder", description: "Utilizing high voltage capacitors, an Arduino microcontroller, and high power Thyristor switches, I constructed a high power coil accelerator utilizing inductive coils.", hours: null},
+                {title: "Neopixel Addressable Lightsaber", date: "2025 Summer", role: "Builder", description: "I custom designed the hilt and electronics for a neopixel lightsaber that had addressable LEDs and a light-diffused blade.", hours: null}
+            ],
+            extracurriculars: [
+                {title: "Engineering Club", date: "2023-Present", role: "Officer (11th)", description: "Organize meetings across EE/Aerospace/Mechanical divisions, lead workshops, coordinate field trips.", hours: null},
+                {title: "FIRST Robotics (Team 1351)", date: "2022-Present", role: "Member", description: "Electrical systems design/troubleshooting, CAD mechanical components, CNC/lathe operation.", hours: null},
+                {title: "Violin / School Orchestra", date: "2014-Present", role: "Member", description: "Carnatic → Western classical transition. Continuous since 4th grade.", hours: null},
+                {title: "ACM AI Summit Speech", date: "Summer 2026", role: "", description: "We were invited by the ACM organization after they liked our science fair project, they offered to let us talk at one of their local Bay Area chapter's AI summit speeches.", hours: null},
+                {title: "Tennis Player/Varsity Tennis", date: "2016-2024", role: "Doubles Player", description: "Played tennis for a large part of my life in India and in America, played on my varsity tennis team at Mitty. Ultimately had to stop due to my commitment to robotics and other activities.", hours: null},
+                {title: "JV Wrestling", date: "2023-2024", role: "", description: "", hours: null},
+                {title: "FLL Robotics", date: "2019-2021", role: "Team Member", description: "I worked with my FLL team to design our robot and write code for it. Our team qualified to regionals.", hours: null}
+            ],
+            awards: [
+                {title: "Principal's Honor Roll", date: "2023-Present", role: "Archbishop Mitty HS", description: "", hours: null},
+                {title: "English Undergraduate Award", date: "2025", role: "Archbishop Mitty HS", description: "", hours: null},
+                {title: "Invention Convention National Finalist", date: "2021", role: "", description: "I developed a solar powered shoe heating system that got me to the national finals of invention convention.", hours: null}
+            ],
+            volunteering: [
+                {title: "Fremont FUSD Youth Orchestra", date: "2022-2025", role: "Volunteer Instructor", description: "Taught violin technique to elementary students. ~2 hours/week for 3 years.", hours: 100},
+                {title: "Second Harvest Food Bank", date: "2024-Present", role: "Volunteer", description: "Sort and distribute food to Bay Area families.", hours: 23},
+                {title: "Open House Orchestra Concert", date: "2023-Present", role: "", description: "I played for my schools open house with our orchestra.", hours: 15}
+            ],
+            skills: [
+                {title: "ANSYS Lumerical (FDTD)", date: "2024 Summer", role: "Intermediate", description: "Electromagnetic simulation for photonics", hours: null},
+                {title: "Python", date: "2025 Summer", role: "Beginner", description: "Sensor integration, data processing", hours: null},
+                {title: "Arduino/Embedded", date: "2023-Present", role: "Advanced", description: "C/C++ microcontroller programming", hours: null},
+                {title: "CAD Design", date: "2020-Present", role: "Intermediate", description: "Mechanical component design", hours: null},
+                {title: "Circuit Design", date: "2022-Present", role: "Advanced", description: "High-voltage and low-voltage systems", hours: null},
+                {title: "3D Printing", date: "2022-Present", role: "Advanced", description: "Extensive experience with 3D printing technologies along with slicer settings and general usage of 3D printers.", hours: null},
+                {title: "Machinery and Tools", date: "2024-Present", role: "", description: "Experience with various tools from lathes to routers many other manufacturing means. Also experience with power tools in construction setting.", hours: null}
+            ]
+        };
+        
+        let currentCategory = '';
+        let editingIndex = -1;
+        
+        // Initialize
+        function init() {
+            renderAll();
+            updateStats();
+            updateStatsDisplay();
+            attachEventListeners();
+            loadFromLocalStorage();
+        }
+        
+        // Attach all event listeners
+        function attachEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+            
+            // Add buttons
+            document.querySelectorAll('.add-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    openModal(this.dataset.category);
+                });
+            });
+            
+            // Stat cards
+            document.querySelectorAll('.stat-card.clickable').forEach(card => {
+                card.addEventListener('click', function() {
+                    editStat(this.dataset.stat);
+                });
+            });
+            
+            // Control buttons
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            document.getElementById('resumeBtn').addEventListener('click', generateResume);
+            
+            // File input
+            document.getElementById('fileInput').addEventListener('change', importData);
+            
+            // Form
+            document.getElementById('itemForm').addEventListener('submit', handleFormSubmit);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            
+            // Search
+            document.getElementById('searchBox').addEventListener('input', handleSearch);
+        }
+        
+        // Edit stat
+        function editStat(statType) {
+            const labels = {
+                gpa: 'Unweighted GPA',
+                wgpa: 'Weighted GPA',
+                sat: 'SAT Score'
+            };
+            
+            const newValue = prompt(`Enter new ${labels[statType]}:`, stats[statType]);
+            
+            if (newValue !== null && newValue !== '') {
+                stats[statType] = (statType === 'gpa' || statType === 'wgpa') ? parseFloat(newValue) : parseInt(newValue);
+                updateStatsDisplay();
+                saveToLocalStorage();
+            }
+        }
+        
+        // Update stats display
+        function updateStatsDisplay() {
+            document.getElementById('statGPA').textContent = stats.gpa.toFixed(1);
+            document.getElementById('statWGPA').textContent = stats.wgpa.toFixed(3);
+            document.getElementById('statSAT').textContent = stats.sat;
+            document.getElementById('statCourses').textContent = portfolioData.academics.length;
+            document.getElementById('statProjects').textContent = portfolioData.projects.length;
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
+        }
+        
+        // Render all categories
+        function renderAll() {
+            Object.keys(portfolioData).forEach(category => {
+                renderCategory(category);
+            });
+        }
+        
+        // Render category
+        function renderCategory(category) {
+            const container = document.getElementById(`${category}-list`);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            portfolioData[category].forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                
+                let html = `<div class="item-title">${item.title}</div>`;
+                if (item.date) html += `<div class="item-meta">📅 ${item.date}</div>`;
+                if (item.role) html += `<div class="item-meta">👤 ${item.role}</div>`;
+                if (item.hours) html += `<div class="item-meta">⏱️ ${item.hours} hours</div>`;
+                if (item.description) html += `<div class="item-description">${item.description}</div>`;
+                
+                html += `<div class="item-actions">
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </div>`;
+                
+                itemDiv.innerHTML = html;
+                
+                // Attach event listeners
+                itemDiv.querySelector('.edit-btn').addEventListener('click', () => editItem(category, index));
+                itemDiv.querySelector('.delete-btn').addEventListener('click', () => deleteItem(category, index));
+                
+                container.appendChild(itemDiv);
+            });
+        }
+        
+        // Open modal
+        function openModal(category) {
+            currentCategory = category;
+            editingIndex = -1;
+            document.getElementById('modalTitle').textContent = `Add ${category.charAt(0).toUpperCase() + category.slice(1, -1)}`;
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemModal').classList.add('active');
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+        
+        // Edit item
+        function editItem(category, index) {
+            currentCategory = category;
+            editingIndex = index;
+            const item = portfolioData[category][index];
+            
+            document.getElementById('modalTitle').textContent = 'Edit Item';
+            document.getElementById('itemTitle').value = item.title || '';
+            document.getElementById('itemDate').value = item.date || '';
+            document.getElementById('itemRole').value = item.role || '';
+            document.getElementById('itemDescription').value = item.description || '';
+            document.getElementById('itemHours').value = item.hours || '';
+            
+            document.getElementById('itemModal').classList.add('active');
+        }
+        
+        // Delete item
+        function deleteItem(category, index) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                portfolioData[category].splice(index, 1);
+                renderCategory(category);
+                updateStats();
+                saveToLocalStorage();
+            }
+        }
+        
+        // Handle form submit
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const newItem = {
+                title: document.getElementById('itemTitle').value,
+                date: document.getElementById('itemDate').value,
+                role: document.getElementById('itemRole').value,
+                description: document.getElementById('itemDescription').value,
+                hours: document.getElementById('itemHours').value ? parseInt(document.getElementById('itemHours').value) : null
+            };
+            
+            if (editingIndex >= 0) {
+                portfolioData[currentCategory][editingIndex] = newItem;
+            } else {
+                portfolioData[currentCategory].push(newItem);
+            }
+            
+            renderCategory(currentCategory);
+            updateStats();
+            saveToLocalStorage();
+            closeModal();
+        }
+        
+        // Update stats
+        function updateStats() {
+            updateStatsDisplay();
+        }
+        
+        // Handle search
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            Object.keys(portfolioData).forEach(category => {
+                const container = document.getElementById(`${category}-list`);
+                if (!container) return;
+                
+                const items = container.querySelectorAll('.item');
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+        }
+        
+        // Export data
+        function exportData() {
+            const fullData = {
+                stats: stats,
+                portfolio: portfolioData
+            };
+            const dataStr = JSON.stringify(fullData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'vrishank-portfolio-data.json';
+            link.click();
+        }
+        
+        // Import data
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    if (imported.stats && imported.portfolio) {
+                        stats = imported.stats;
+                        portfolioData = imported.portfolio;
+                    } else {
+                        portfolioData = imported;
+                    }
+                    
+                    renderAll();
+                    updateStats();
+                    updateStatsDisplay();
+                    saveToLocalStorage();
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    alert('Error importing data. Please check the file format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Generate resume
+        function generateResume() {
+            let resume = 'VRISHANK RAM - ACTIVITY PORTFOLIO\n';
+            resume += '='.repeat(50) + '\n\n';
+            resume += `UW GPA: ${stats.gpa} | W GPA: ${stats.wgpa} | SAT: ${stats.sat}\n`;
+            resume += `Coursework: ${portfolioData.academics.length} | Projects: ${portfolioData.projects.length}\n\n`;
+            
+            Object.keys(portfolioData).forEach(category => {
+                resume += `${category.toUpperCase()}\n`;
+                resume += '-'.repeat(50) + '\n';
+                portfolioData[category].forEach(item => {
+                    resume += `• ${item.title}`;
+                    if (item.date) resume += ` (${item.date})`;
+                    if (item.role) resume += ` - ${item.role}`;
+                    resume += '\n';
+                    if (item.description) resume += `  ${item.description}\n`;
+                    if (item.hours) resume += `  Hours: ${item.hours}\n`;
+                    resume += '\n';
+                });
+                resume += '\n';
+            });
+            
+            const blob = new Blob([resume], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'vrishank-resume.txt';
+            link.click();
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            const saveData = {
+                stats: stats,
+                portfolio: portfolioData
+            };
+            localStorage.setItem('vrishankPortfolio', JSON.stringify(saveData));
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('vrishankPortfolio');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.stats && data.portfolio) {
+                        stats = data.stats;
+                        portfolioData = data.portfolio;
+                    }
+                    renderAll();
+                    updateStats();
+                    updateStatsDisplay();
+                } catch (e) {
+                    console.log('Using default data');
+                }
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
