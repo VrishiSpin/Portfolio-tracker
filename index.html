@@ -1,17 +1,4 @@
-// Add this at the very beginning of your <script> section
-(function() {
-    const correctPassword = "yourpassword123"; // Change this!
-    const savedPassword = sessionStorage.getItem('portfolioAuth');
-    
-    if (savedPassword !== correctPassword) {
-        const password = prompt('Enter password to access portfolio:');
-        if (password !== correctPassword) {
-            document.body.innerHTML = '<h1>Access Denied</h1>';
-            throw new Error('Wrong password');
-        }
-        sessionStorage.setItem('portfolioAuth', password);
-    }
-})();
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -551,7 +538,7 @@
             ],
             extracurriculars: [
                 {title: "Engineering Club", date: "2023-Present", role: "Officer (11th)", description: "Organize meetings across EE/Aerospace/Mechanical divisions, lead workshops, coordinate field trips.", hours: null},
-                {title: "FIRST Robotics (Team 1351)", date: "2022-Present", role: "Member", description: "Electrical systems design/troubleshooting, CAD mechanical components, CNC/lathe operation.", hours: null},
+                {title: "FIRST MIR/FRC Robotics (Team 1351)", date: "2024-Present", role: "Member", description: "Electrical systems design/troubleshooting, CAD mechanical components, CNC/lathe operation.", hours: null},
                 {title: "Violin / School Orchestra", date: "2014-Present", role: "Member", description: "Carnatic → Western classical transition. Continuous since 4th grade.", hours: null},
                 {title: "ACM AI Summit Speech", date: "Summer 2026", role: "", description: "We were invited by the ACM organization after they liked our science fair project, they offered to let us talk at one of their local Bay Area chapter's AI summit speeches.", hours: null},
                 {title: "Tennis Player/Varsity Tennis", date: "2016-2024", role: "Doubles Player", description: "Played tennis for a large part of my life in India and in America, played on my varsity tennis team at Mitty. Ultimately had to stop due to my commitment to robotics and other activities.", hours: null},
